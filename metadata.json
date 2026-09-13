@@ -1,0 +1,6 @@
+{
+  "name": "Bobo's Learning Adventure",
+  "description": "A fun educational adventure game for young children.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

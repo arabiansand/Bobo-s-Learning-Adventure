@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pi Network Auth</title>
+    <!-- Include Pi Network SDK -->
+    <script src="https://sdk.minepi.com/pi-sdk.js"></script>
+    <style>
+        body { 
+            font-family: sans-serif; 
+            display: flex; 
+            justify-content: center; 
+            align-items: center; 
+            height: 100vh; 
+            background-color: #E0F7FA;
+            margin: 0;
+            text-align: center;
+        }
+        .container {
+            padding: 20px;
+        }
+        button { 
+            padding: 15px 30px; 
+            font-size: 18px; 
+            background-color: #f3a952; 
+            border: none; 
+            border-radius: 8px; 
+            color: white; 
+            margin-top: 20px;
+            font-weight: bold;
+        }
+        #status {
+            margin-top: 20px;
+            font-size: 16px;
+            color: #333;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h2 style="color: #00796B;">Pi Network Auth</h2>
+        <p>Signing you into the learning adventure...</p>
+        <button onclick="authenticate()">Sign In with Pi</button>
+        <p id="status"></p>
+    </div>
+    <script>
+        // Use Pi.init as a Promise as requested
+        const initPi = async () => {
+            try {
+                // Initialize Pi SDK (using version 2.0 per documentation)
+                await Pi.init({ version: "2.0", sandbox: true }); 
+                return true;
+            } catch (err) {
+                document.getElementById('status').innerText = "Init Error: " + err;
+                return false;
+            }
+        };
+
+        const authenticate = async () => {
+            document.getElementById('status').innerText = "Authenticating...";
+            try {
+                const initialized = await initPi();
+                if (!initialized) return;
+
+                const scopes = ['username'];
+                const onIncompletePaymentFound = (payment) => { /* Handle incomplete payments if any */ };
+                
+                const authResults = await Pi.authenticate(scopes, onIncompletePaymentFound);
+                
+                document.getElementById('status').innerText = "Success! Returning to app...";
+                
+                if (window.Android) {
+                    window.Android.onPiAuthenticated(authResults.accessToken, authResults.user.username);
+                }
+            } catch (err) {
+                document.getElementById('status').innerText = "Auth Error: " + err;
+                if (window.Android) {
+                    window.Android.onPiAuthError(String(err));
+                }
+            }
+        };
+
+        // Trigger automatically when the app loads
+        window.onload = () => {
+            authenticate();
+        };
+    </script>
+</body>
+</html>
